@@ -35,8 +35,10 @@ import optax
 from datasets import Dataset, load_dataset
 from flax.core.frozen_dict import freeze, unfreeze
 from flax.training.common_utils import onehot, stack_forest
-from jax.experimental.maps import mesh
-from jax.experimental.pjit import pjit
+# from jax.experimental.maps import mesh
+from jax.sharding import Mesh
+
+# from jax.experimental.pjit import pjit
 from partitions import set_partitions
 from tqdm import tqdm
 
@@ -498,7 +500,7 @@ def main():
 
     # pjit the get_initial_state function to shard params and init
     # optimizer state in sharded way
-    p_get_initial_state = pjit(
+    p_get_initial_state = jax.jit(
         get_initial_state,
         in_axis_resources=None,
         out_axis_resources=(opt_state_spec, param_spec),
@@ -558,14 +560,14 @@ def main():
         # metrics
         return {"loss": loss}
 
-    p_train_step = pjit(
+    p_train_step = jax.jit(
         train_step,
         in_axis_resources=(param_spec, opt_state_spec, None, None, None),
         out_axis_resources=(param_spec, opt_state_spec, None, None, None),
         donate_argnums=(0, 1),
     )
 
-    p_eval_step = pjit(
+    p_eval_step = jax.jit(
         eval_step,
         in_axis_resources=(None, None, param_spec),
         out_axis_resources=None,
