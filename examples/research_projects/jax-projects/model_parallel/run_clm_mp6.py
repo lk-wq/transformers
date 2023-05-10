@@ -628,7 +628,7 @@ def main():
 
                     train_metrics = []
 
-                if cur_step % training_args.eval_steps == 0 and cur_step > 0:
+                if cur_step % 96 == 0 and cur_step > 0:
                     # ======================== Evaluating ==============================
                     eval_metrics = []
                     eval_loader = data_loader(input_rng, eval_dataset, eval_batch_size)
@@ -653,7 +653,7 @@ def main():
                         f" {eval_metrics['perplexity']}"
                     )
 
-                if cur_step % training_args.save_steps == 0 and cur_step > 0:
+                if cur_step % 192 == 0 and cur_step > 0:
                     # save checkpoint after each epoch and push checkpoint to the hub
                     if jax.process_index() == 0:
                         params = jax.device_get(params)
