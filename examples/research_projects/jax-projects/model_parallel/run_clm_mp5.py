@@ -34,6 +34,8 @@ from tqdm import tqdm
 
 from jax.experimental.maps import xmap
 from jax.experimental.pjit import pjit
+from jax.sharding import Mesh
+
 import jax
 import jax.numpy as jnp
 import optax
@@ -515,7 +517,7 @@ def main():
     mesh_devices = np.array(jax.devices()).reshape(1, jax.local_device_count())
 
     # actually initialize the opt_state
-    with mesh(mesh_devices, ("dp", "mp")):
+    with Mesh(mesh_devices, ("dp", "mp")):
         opt_state, params = p_get_initial_state(freeze(model.params))
 
     # cross-entropy with z loss
@@ -586,7 +588,7 @@ def main():
     epochs = tqdm(range(num_epochs), desc=f"Epoch ... (1/{num_epochs})", position=0)
     global_step = 0
     # we are not doing 2D parallelism (yet!), this just does model parallelism
-    with mesh(mesh_devices, ("dp", "mp")):
+    with Mesh(mesh_devices, ("dp", "mp")):
         for _ in epochs:
             # ======================== Training ================================
             train_start = time.time()
