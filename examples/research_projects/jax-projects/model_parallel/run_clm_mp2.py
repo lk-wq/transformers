@@ -32,6 +32,8 @@ import numpy as np
 from datasets import Dataset, load_dataset
 from tqdm import tqdm
 
+from jax.experimental.maps import xmap
+
 import jax
 import jax.numpy as jnp
 import optax
@@ -499,7 +501,7 @@ def main():
 
     # pjit the get_initial_state function to shard params and init
     # optimizer state in sharded way
-    p_get_initial_state = jax.jit(
+    p_get_initial_state = xmap(
         get_initial_state,
         in_axis_resources=None,
         out_axis_resources=(opt_state_spec, param_spec),
@@ -559,14 +561,14 @@ def main():
         # metrics
         return {"loss": loss}
 
-    p_train_step = jax.jit(
+    p_train_step = xmap(
         train_step,
         in_axis_resources=(param_spec, opt_state_spec, None, None, None),
         out_axis_resources=(param_spec, opt_state_spec, None, None, None),
         donate_argnums=(0, 1),
     )
 
-    p_eval_step = jax.jit(
+    p_eval_step = xmap(
         eval_step,
         in_axis_resources=(None, None, param_spec),
         out_axis_resources=None,
