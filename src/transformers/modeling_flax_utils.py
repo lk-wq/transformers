@@ -794,8 +794,10 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
             )
 
         # init random models
-        model = cls(config, *model_args, _do_init=_do_init, **model_kwargs)
+        print("pre model")
 
+        model = cls(config, *model_args, _do_init=_do_init, **model_kwargs)
+        print("post model")
         if from_pt:
             state = load_pytorch_checkpoint_in_flax_state_dict(model, resolved_archive_file, is_sharded)
         else:
