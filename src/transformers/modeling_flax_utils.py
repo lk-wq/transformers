@@ -795,7 +795,7 @@ class FlaxPreTrainedModel(PushToHubMixin, FlaxGenerationMixin):
 
         # init random models
         print("pre model")
-
+        _do_init = False
         model = cls(config, *model_args, _do_init=_do_init, **model_kwargs)
         print("post model")
         if from_pt:
