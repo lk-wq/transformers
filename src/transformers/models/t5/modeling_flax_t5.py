@@ -968,7 +968,7 @@ class FlaxT5PreTrainedModel(FlaxPreTrainedModel):
 
         params_rng, dropout_rng = jax.random.split(rng)
         rngs = {"params": params_rng, "dropout": dropout_rng}
-
+        print("self module ",self.module)
         random_params = self.module.init(
             rngs,
             *args,
